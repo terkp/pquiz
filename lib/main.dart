@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pfingst_freizeit_quizz/model/questions/Standard.dart';
+import 'package:pfingst_freizeit_quizz/ui/StandardWidget.dart';
 
 void main() {
   runApp(MyApp());
@@ -28,7 +30,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -93,6 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            StandardWidget(question: Standard(id: 1, title: "Frage", answers: ["Antwort 1", "Antwort 2", "Antwort 3"])),
             Text(
               'You have pushed the button this many times:',
             ),
