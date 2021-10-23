@@ -1,4 +1,4 @@
-import 'package:pfingst_freizeit_quizz/model/questions/Question.dart';
+import 'Question.dart';
 
 class Standard extends Question {
   final List<String> answers;

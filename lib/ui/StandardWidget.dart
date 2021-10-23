@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pfingst_freizeit_quizz/model/questions/Standard.dart';
+import 'package:pfingst_freizeit_quizz/network/Webservice.dart';
+import '../model/questions/Standard.dart';
 
 class StandardWidget extends StatefulWidget {
   final Standard question;
@@ -13,6 +14,8 @@ class StandardWidget extends StatefulWidget {
 class _StandardWidgetState extends State<StandardWidget> {
   String? currentAnswer;
 
+  bool lock = false;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -21,15 +24,33 @@ class _StandardWidgetState extends State<StandardWidget> {
       ]
         ..addAll(getAnswerRadibuttons(widget.question.answers))
         ..add(TextButton(
-            onPressed: () {
+            onPressed: lock?null: () async {
               if (currentAnswer == null) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text("Bitte erst Antwort auswählen"),
                   ),
                 );
-              }else {
-                //Todo currentAnswerSenden
+              } else {
+                if (await sendAnswerStandard(
+                    question: widget.question, answer: currentAnswer!)) {
+                  setState(() {
+                    lock = true;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content:
+                      Text("Antwort abgesendet."),
+                    ),
+                  );
+                }
+                else{
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Ein Fehler ist aufgetreten. So ein mist."),
+                    ),
+                  );
+                }
               }
             },
             child: Text("Absenden"))),
@@ -44,9 +65,11 @@ class _StandardWidgetState extends State<StandardWidget> {
             value: answer,
             groupValue: currentAnswer,
             onChanged: (String? value) {
-              setState(() {
-                currentAnswer = value;
-              });
+              if (!lock) {
+                setState(() {
+                  currentAnswer = value;
+                });
+              }
             },
           ),
         ),

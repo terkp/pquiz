@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'model/questions/Order.dart';
 import 'model/questions/Question.dart';
 import 'model/questions/Standard.dart';
+import 'network/Webservice.dart';
 import 'ui/GuessWidget.dart';
 import 'ui/OrderWidget.dart';
 import 'ui/StandardWidget.dart';
@@ -13,10 +14,11 @@ void main() {
   currentQuestionStreamController = StreamController<Question>();
   currentQuestion = currentQuestionStreamController.stream;
   currentQuestionStreamController.sink.add(Guess(title: "Frage1", id: 2));
-  Future.delayed(Duration(seconds: 20)).then((value) =>
+  Timer.periodic(Duration(milliseconds: 250), receiveQuestion);
+  Future.delayed(Duration(seconds: 10)).then((value) =>
       currentQuestionStreamController.sink.add(Standard(
           title: "Frage2", id: 2, answers: ["Antwort 1", "Antwort 2"])));
-  Future.delayed(Duration(seconds: 40)).then((value) =>
+  Future.delayed(Duration(seconds: 20)).then((value) =>
       currentQuestionStreamController.sink.add(
           Order(title: "Frage 3", id: 2, answers: ["Antwort 1", "Antwort 2"])));
   runApp(MyApp());
@@ -77,3 +79,5 @@ Widget getWidgetForQuestion(Question question) {
 
 late Stream<Question> currentQuestion;
 late StreamController<Question> currentQuestionStreamController;
+
+String? groupName;

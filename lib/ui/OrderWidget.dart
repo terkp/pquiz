@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pfingst_freizeit_quizz/model/questions/Order.dart';
+import 'package:pfingst_freizeit_quizz/network/Webservice.dart';
+import '../model/questions/Order.dart';
 
 class OrderWidget extends StatefulWidget {
   final Order question;
@@ -12,6 +13,7 @@ class OrderWidget extends StatefulWidget {
 
 class _OrderWidgetState extends State<OrderWidget> {
   String? currentAnswer;
+  bool lock = false;
 
   @override
   Widget build(BuildContext context) {
@@ -20,31 +22,43 @@ class _OrderWidgetState extends State<OrderWidget> {
       children: [
         Text(widget.question.title),
         SizedBox(
-          height: _items.length*60,
-          child: ReorderableListView(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            children: <Widget>[
-              for (int index = 0; index < _items.length; index++)
-                ListTile(
-                  key: Key('$index'),
-                  trailing: Icon(Icons.view_headline),
-                  title: Text('Item ${_items[index]}'),
+          height: _items.length * 60,
+          child: lock
+              ? Column(
+                  children: <Widget>[
+                    for (int index = 0; index < _items.length; index++)
+                      ListTile(
+                        key: Key('$index'),
+                        trailing: Icon(Icons.view_headline),
+                        title: Text('Item ${_items[index]}'),
+                      ),
+                  ],
+                )
+              : ReorderableListView(
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  children: <Widget>[
+                    for (int index = 0; index < _items.length; index++)
+                      ListTile(
+                        key: Key('$index'),
+                        trailing: Icon(Icons.view_headline),
+                        title: Text('Item ${_items[index]}'),
+                      ),
+                  ],
+                  onReorder: (int oldIndex, int newIndex) {
+                    if (lock) return;
+                    setState(() {
+                      if (oldIndex < newIndex) {
+                        newIndex -= 1;
+                      }
+                      final String item = _items.removeAt(oldIndex);
+                      _items.insert(newIndex, item);
+                    });
+                  },
                 ),
-            ],
-            onReorder: (int oldIndex, int newIndex) {
-              setState(() {
-                if (oldIndex < newIndex) {
-                  newIndex -= 1;
-                }
-                final String item = _items.removeAt(oldIndex);
-                _items.insert(newIndex, item);
-              });
-            },
-          ),
         ),
         TextButton(
           child: Text("Absenden"),
-          onPressed: () {
+          onPressed: lock?null: () {
             showDialog(
               context: context,
               builder: (_) => AlertDialog(
@@ -56,9 +70,27 @@ class _OrderWidgetState extends State<OrderWidget> {
                     child: Text("Abbrechen"),
                   ),
                   TextButton(
-                    onPressed: () {
+                    onPressed: () async {
                       Navigator.of(context).pop();
-                      //Todo absenden
+                      if (await sendAnswerOrder(
+                          question: widget.question, answer: _items)) {
+                        setState(() {
+                          lock = true;
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content:
+                            Text("Ein Fehler ist aufgetreten. So ein mist."),
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                "Ein Fehler ist aufgetreten. So ein mist."),
+                          ),
+                        );
+                      }
                     },
                     child: Text("Ok"),
                   )
@@ -70,21 +102,4 @@ class _OrderWidgetState extends State<OrderWidget> {
       ],
     );
   }
-
-  List<Widget> getAnswerRadibuttons(List<String> answers) => answers
-      .map(
-        (answer) => ListTile(
-          title: Text(answer),
-          leading: Radio<String>(
-            value: answer,
-            groupValue: currentAnswer,
-            onChanged: (String? value) {
-              setState(() {
-                currentAnswer = value;
-              });
-            },
-          ),
-        ),
-      )
-      .toList();
 }
