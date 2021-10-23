@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pfingst_freizeit_quizz/model/questions/Guess.dart';
-import 'package:pfingst_freizeit_quizz/model/questions/Standard.dart';
 
 class GuessWidget extends StatefulWidget {
   final Guess question;
