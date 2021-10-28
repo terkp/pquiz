@@ -1,6 +1,6 @@
 abstract class Question{
   String title;
-  int id;
+  int? id;
 
-  Question({required this.title, required this.id});
+  Question({required this.title, this.id});
 }

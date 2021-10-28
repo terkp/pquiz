@@ -14,7 +14,7 @@ void main() {
   currentQuestionStreamController = StreamController.broadcast();
   currentQuestionStream = currentQuestionStreamController.stream;
   currentQuestionStreamController.sink.add(Guess(title: "Frage1", id: 2));
-  Timer.periodic(Duration(milliseconds: 250), (_)=>receiveQuestion());
+  Timer.periodic(Duration(milliseconds: 250), (_) => receiveQuestion());
   // Future.delayed(Duration(seconds: 10)).then((value) =>
   //     currentQuestionStreamController.sink.add(Standard(
   //         title: "Frage2", id: 2, answers: ["Antwort 1", "Antwort 2"])));
@@ -50,12 +50,29 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
+    Future.delayed(Duration(seconds: 1)).then((value) {
+      if (groupName == null) {
+        showTeamNameDialog();
+      }
+    });
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
-        actions: [Text("TEst")],
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: openTeamNameInput,
+            itemBuilder: (BuildContext context) {
+              return {'Teamname', 'URL'}.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
+          ),
+        ],
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -73,6 +90,66 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+  }
+
+  void openTeamNameInput(String value) {
+    switch (value) {
+      case "Teamname":
+        showTeamNameDialog();
+        break;
+      case "URL":
+        showURLDialog();
+        break;
+    }
+  }
+
+  void showTeamNameDialog() {
+    var textEditingController = TextEditingController(text: groupName);
+    showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text("Teamname eingeben"),
+              content: TextField(
+                controller: textEditingController,
+              ),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text("Abbrechen")),
+                TextButton(
+                    onPressed: () {
+                      groupName = textEditingController.value.text;
+                      Navigator.of(context).pop();
+                    },
+                    child: Text("OK"))
+              ],
+            ));
+  }
+
+  void showURLDialog() {
+    var textEditingController = TextEditingController(text: url);
+    showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+              content: TextField(
+                controller: textEditingController,
+              ),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text("Abbrechen")),
+                TextButton(
+                    onPressed: () {
+                      url = textEditingController.value.text;
+                      Navigator.of(context).pop();
+                    },
+                    child: Text("OK"))
+              ],
+            ));
   }
 }
 

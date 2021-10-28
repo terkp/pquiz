@@ -9,7 +9,7 @@ import '../main.dart';
 import '../model/questions/Question.dart';
 import 'package:http/http.dart' as http;
 
-String url = "http://192.168.178.59:80";
+String url = "http://192.168.178.59:8080";
 
 Future<bool> sendAnswerStandard(
     {required Standard question, required String answer}) async {
@@ -53,7 +53,7 @@ Future<void> receiveQuestion() async {
         await http.get(Uri.parse('$url'));
     final json = jsonDecode(response.body);
     Question question = jsonToQuestion(json);
-    if (currentQuestion?.id != question.id) {
+    if (currentQuestion?.title != question.title) {
       currentQuestionStreamController.sink.add(question);
     }
   } catch (e) {
@@ -66,12 +66,12 @@ Question jsonToQuestion(Map<String, dynamic> json) {
     case 'standard':
       return Standard(
           title: json['title'], answers: json['answers'].whereType<String>().toList() , id: json['id']);
-    case 'guess':
+    case 'schaetzen':
       return Guess(
         title: json['title'],
         id: json['id'],
       );
-    case 'order':
+    case 'sortier':
       return Order(
           title: json['title'], answers: json['answers'].whereType<String>().toList() , id: json['id']);
   }
