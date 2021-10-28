@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pfingst_freizeit_quizz/model/questions/Standard.dart';
-
+// Besser alles neu programmieren
 class nextquestion extends StatefulWidget {
   @override
   State<nextquestion> createState() => _nextquestionState();
