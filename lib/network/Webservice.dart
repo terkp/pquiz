@@ -9,7 +9,7 @@ import '../main.dart';
 import '../model/questions/Question.dart';
 import 'package:http/http.dart' as http;
 
-String url = "http://192.168.178.59:8080";
+String url = "http://192.168.178.59:80";
 
 Future<bool> sendAnswerStandard(
     {required Standard question, required String answer}) async {
