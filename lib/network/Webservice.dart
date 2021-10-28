@@ -48,13 +48,21 @@ Future<bool> sendAnswer(
 }
 
 Future<void> receiveQuestion() async {
-  final repsonse = await http.get(Uri.parse('$url'), headers: <String, String>{
-    'Content-Type': 'application/json; charset=UTF-8',
-  });
-  final json = jsonDecode(repsonse.body);
-  Question question = jsonToQuestion(json);
-  if ((await currentQuestion.last).id != question.id) {
-    currentQuestionStreamController.sink.add(question);
+  var cQue = (await currentQuestion.last);
+  try {
+    print(cQue.id);
+    final repsonse =
+        await http.get(Uri.parse('$url'), headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    });
+    final json = jsonDecode(repsonse.body);
+    Question question = jsonToQuestion(json);
+    if (cQue.id != question.id) {
+      currentQuestionStreamController.sink.add(question);
+    }
+  } catch (e) {
+    print(e);
+    print(cQue.id);
   }
 }
 
@@ -62,6 +70,14 @@ Question jsonToQuestion(Map<String, dynamic> json) {
   switch (json['questionType']) {
     case 'standard':
       return Standard(
+          title: json['title'], answers: json['answers'], id: json['id']);
+    case 'guess':
+      return Guess(
+        title: json['title'],
+        id: json['id'],
+      );
+    case 'order':
+      return Order(
           title: json['title'], answers: json['answers'], id: json['id']);
   }
   throw Error();
