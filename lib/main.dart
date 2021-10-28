@@ -12,15 +12,15 @@ import 'model/questions/Guess.dart';
 
 void main() {
   currentQuestionStreamController = StreamController.broadcast();
-  currentQuestion = currentQuestionStreamController.stream;
+  currentQuestionStream = currentQuestionStreamController.stream;
   currentQuestionStreamController.sink.add(Guess(title: "Frage1", id: 2));
   Timer.periodic(Duration(milliseconds: 250), (_)=>receiveQuestion());
-  Future.delayed(Duration(seconds: 10)).then((value) =>
-      currentQuestionStreamController.sink.add(Standard(
-          title: "Frage2", id: 2, answers: ["Antwort 1", "Antwort 2"])));
-  Future.delayed(Duration(seconds: 20)).then((value) =>
-      currentQuestionStreamController.sink.add(
-          Order(title: "Frage 3", id: 2, answers: ["Antwort 1", "Antwort 2"])));
+  // Future.delayed(Duration(seconds: 10)).then((value) =>
+  //     currentQuestionStreamController.sink.add(Standard(
+  //         title: "Frage2", id: 2, answers: ["Antwort 1", "Antwort 2"])));
+  // Future.delayed(Duration(seconds: 20)).then((value) =>
+  //     currentQuestionStreamController.sink.add(
+  //         Order(title: "Frage 3", id: 2, answers: ["Antwort 1", "Antwort 2"])));
   runApp(MyApp());
 }
 
@@ -55,15 +55,21 @@ class _MyHomePageState extends State<MyHomePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        actions: [Text("TEst")],
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
         child: StreamBuilder<Question>(
-          builder: (_, snapshot) => snapshot.hasData
-              ? getWidgetForQuestion(snapshot.data!)
-              : Text("Nix"),
-          stream: currentQuestion,
+          builder: (_, snapshot) {
+            if (snapshot.hasData) {
+              currentQuestion = snapshot.data;
+              return getWidgetForQuestion(snapshot.data!);
+            } else {
+              return Text("Nix");
+            }
+          },
+          stream: currentQuestionStream,
         ),
       ),
     );
@@ -77,7 +83,7 @@ Widget getWidgetForQuestion(Question question) {
   throw Error();
 }
 
-late Stream<Question> currentQuestion;
+late Stream<Question> currentQuestionStream;
 late StreamController<Question> currentQuestionStreamController;
-
+Question? currentQuestion;
 String? groupName;

@@ -9,7 +9,7 @@ import '../main.dart';
 import '../model/questions/Question.dart';
 import 'package:http/http.dart' as http;
 
-String url = "http://192.168.178.117:8080";
+String url = "http://192.168.178.59:80";
 
 Future<bool> sendAnswerStandard(
     {required Standard question, required String answer}) async {
@@ -40,29 +40,24 @@ Future<bool> sendAnswer(
         'answer': answer
       }),
     );
-    return true; //response.statusCode == 200;
+    return response.statusCode == 200;
   } catch (e) {
     print(e);
-    return true;
+    return false;
   }
 }
 
 Future<void> receiveQuestion() async {
-  var cQue = (await currentQuestion.last);
   try {
-    print(cQue.id);
-    final repsonse =
-        await http.get(Uri.parse('$url'), headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    });
-    final json = jsonDecode(repsonse.body);
+    final response =
+        await http.get(Uri.parse('$url'));
+    final json = jsonDecode(response.body);
     Question question = jsonToQuestion(json);
-    if (cQue.id != question.id) {
+    if (currentQuestion?.id != question.id) {
       currentQuestionStreamController.sink.add(question);
     }
   } catch (e) {
     print(e);
-    print(cQue.id);
   }
 }
 
@@ -70,7 +65,7 @@ Question jsonToQuestion(Map<String, dynamic> json) {
   switch (json['questionType']) {
     case 'standard':
       return Standard(
-          title: json['title'], answers: json['answers'], id: json['id']);
+          title: json['title'], answers: json['answers'].whereType<String>().toList() , id: json['id']);
     case 'guess':
       return Guess(
         title: json['title'],
@@ -78,7 +73,7 @@ Question jsonToQuestion(Map<String, dynamic> json) {
       );
     case 'order':
       return Order(
-          title: json['title'], answers: json['answers'], id: json['id']);
+          title: json['title'], answers: json['answers'].whereType<String>().toList() , id: json['id']);
   }
   throw Error();
 }
