@@ -14,7 +14,7 @@ void main() {
   currentQuestionStreamController = StreamController.broadcast();
   currentQuestionStream = currentQuestionStreamController.stream;
   currentQuestionStreamController.sink.add(Guess(title: "Frage1", id: 2));
-  Timer.periodic(Duration(milliseconds: 250), (_) => receiveQuestion());
+  Timer.periodic(Duration(milliseconds: 500), (_) => receiveQuestion());
   // Future.delayed(Duration(seconds: 10)).then((value) =>
   //     currentQuestionStreamController.sink.add(Standard(
   //         title: "Frage2", id: 2, answers: ["Antwort 1", "Antwort 2"])));
